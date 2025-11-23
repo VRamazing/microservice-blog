@@ -23,13 +23,26 @@ app.post('/events', (req, res) => {
     }
 
     if( type === "CommentCreated"){
-      const {id, content, postId} = data
+      const {id, content, postId, status} = data
       const post = posts[postId]
-      post.comments.push({id, content})
+      post.comments.push({id, content, status})
     }
+    
+    if( type === "CommentUpdated"){
+      console.log(data)
+      const {id, content, postId, status} = data 
+      const post = posts[postId]
+      const comment = comment.find(c => c.id === id)
+      if(comment){
+        comment.content = content
+        comment.status = status
+      }
+      console.log("comment Updated", comment)
+      console.log(post)
+    }
+
     console.log("Event recieved", type)
-    console.log(posts)
-    res.status(200)
+    res.status(200).send({})
 })
 
 app.listen(PORT, () => {

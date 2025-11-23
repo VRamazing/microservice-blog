@@ -5,17 +5,22 @@ const PORT = 4005;
 const app = express();
 app.use(bodyParser.json());
 
-app.post("/events", (req, res) => {
+app.post("/events", async (req, res) => {
   const event = req.body;
-  axios.post("http://localhost:4000/events", event).catch((err) => {
-    console.log(err.message);
-  });
-  axios.post("http://localhost:4001/events", event).catch((err) => {
-    console.log(err.message);
-  });
-  axios.post("http://localhost:4002/events", event).catch((err) => {
-    console.log(err.message);
-  });
+  const services = [
+    "http://localhost:4000/events",
+    "http://localhost:4001/events",
+    "http://localhost:4002/events",
+    "http://localhost:4003/events",
+  ];
+
+  await Promise.all(
+    services.map((url) =>
+      axios.post(url, event).catch((err) => {
+        console.log(`Error posting to ${url}: ${err.message}`);
+      })
+    )
+  );
 
   res.send({ status: "OK" });
 });
