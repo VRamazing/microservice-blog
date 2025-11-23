@@ -1,32 +1,30 @@
-const express = require("express")
-const axios = require("axios")
-const bodyParser = require("body-parser")
-const PORT = 4003
-const app = express()
+const express = require('express');
+const bodyParser = require('body-parser');
+const axios = require('axios');
 
-app.use(bodyParser.json())
+const app = express();
+app.use(bodyParser.json());
 
 app.post('/events', async (req, res) => {
-    const { type, data } = req.body
-    let {id, content, status, postId} = data
+  const { type, data } = req.body;
 
-    if(type === "CommentCreated"){
-        status = status.includes('orange') ? 'rejected' : 'approved'
-    }
+  if (type === 'CommentCreated') {
+    const status = data.content.includes('orange') ? 'rejected' : 'approved';
 
     await axios.post('http://localhost:4005/events', {
-        type: 'CommentModerated',
-        data: {
-            id,
-            postId,
-            content,
-            status
-        }
-    }) 
+      type: 'CommentModerated',
+      data: {
+        id: data.id,
+        postId: data.postId,
+        status,
+        content: data.content
+      }
+    });
+  }
 
-    res.send({})
-})
+  res.send({});
+});
 
-app.listen(PORT, () => {
-    console.log(`Moderation Listening on port: ${PORT}`)
-})
+app.listen(4003, () => {
+  console.log('Listening on 4003');
+});
